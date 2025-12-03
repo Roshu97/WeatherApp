@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: weather-app
+    runtime: static
+    staticPublishPath: .
+    buildCommand: echo "Static site ready"
+    startCommand: python3 -m http.server 8000
+    envVars:
+      - key: OPENWEATHER_API_KEY
+        sync: false
+    region: singapore
+    plan: starter
+    preDeployCommand: echo "Deploying Weather App"
