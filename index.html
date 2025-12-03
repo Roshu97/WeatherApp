@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Get Real-Time Weather Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1>🌤️ Weather App</h1>
+            <p class="subtitle">Check the weather in any city, anytime</p>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Enter city name (e.g., London, New York, Tokyo)"
+                    autocomplete="off"
+                >
+                <button id="searchBtn" class="search-btn">Search</button>
+                <button id="geoBtn" class="geo-btn" title="Use my location">📍</button>
+            </div>
+            <div class="unit-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="unitToggle">
+                    <span class="slider"></span>
+                </label>
+                <span id="unitLabel">°C</span>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorContainer" class="error-container hidden">
+            <div class="error-message">
+                <span id="errorText"></span>
+                <button class="close-error" onclick="closeError()">✕</button>
+            </div>
+        </div>
+
+        <!-- Weather Display Section -->
+        <main class="weather-display hidden" id="weatherDisplay">
+            <!-- Current Weather Card -->
+            <section class="current-weather">
+                <div class="weather-header">
+                    <div class="location-info">
+                        <h2 id="cityName" class="city-name"></h2>
+                        <p id="date" class="date"></p>
+                    </div>
+                    <div id="weatherIcon" class="weather-icon"></div>
+                </div>
+
+                <div class="weather-main">
+                    <div class="temperature-display">
+                        <span id="temperature" class="temperature"></span>
+                        <span id="unitSymbol" class="unit">°C</span>
+                    </div>
+                    <div class="weather-description">
+                        <p id="description" class="description"></p>
+                        <p id="feelsLike" class="feels-like"></p>
+                    </div>
+                </div>
+
+                <!-- Weather Details Grid -->
+                <div class="weather-details">
+                    <div class="detail-card">
+                        <span class="detail-icon">💨</span>
+                        <p class="detail-label">Wind Speed</p>
+                        <p id="windSpeed" class="detail-value"></p>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-icon">💧</span>
+                        <p class="detail-label">Humidity</p>
+                        <p id="humidity" class="detail-value"></p>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-icon">🔍</span>
+                        <p class="detail-label">Visibility</p>
+                        <p id="visibility" class="detail-value"></p>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-icon">🅿️</span>
+                        <p class="detail-label">Pressure</p>
+                        <p id="pressure" class="detail-value"></p>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-icon">👁️</span>
+                        <p class="detail-label">UV Index</p>
+                        <p id="uvIndex" class="detail-value"></p>
+                    </div>
+                    <div class="detail-card">
+                        <span class="detail-icon">🌅</span>
+                        <p class="detail-label">Sunrise</p>
+                        <p id="sunrise" class="detail-value"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sun Position -->
+            <section class="sun-info">
+                <div class="sun-times">
+                    <div class="sun-time">
+                        <span class="sun-icon">🌅</span>
+                        <p>Sunrise</p>
+                        <p id="sunriseTime" class="sun-value"></p>
+                    </div>
+                    <div class="sun-time">
+                        <span class="sun-icon">🌇</span>
+                        <p>Sunset</p>
+                        <p id="sunsetTime" class="sun-value"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional Info -->
+            <section class="additional-info">
+                <div class="info-card">
+                    <h3>Cloud Cover</h3>
+                    <div class="progress-bar">
+                        <div id="cloudProgress" class="progress-fill"></div>
+                    </div>
+                    <p id="cloudPercentage" class="percentage-text"></p>
+                </div>
+            </section>
+
+            <!-- Air Quality Index (AQI) Section -->
+            <section class="aqi-section">
+                <div class="aqi-container">
+                    <h2>🌍 Air Quality Index (AQI)</h2>
+                    <div class="aqi-main">
+                        <div class="aqi-score">
+                            <div class="aqi-circle">
+                                <span id="aqiValue" class="aqi-number">-</span>
+                                <span class="aqi-label">AQI</span>
+                            </div>
+                            <div class="aqi-status">
+                                <p id="aqiLevel" class="aqi-level-text">Loading...</p>
+                                <p id="aqiDescription" class="aqi-description"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pollutants Grid -->
+                    <div class="pollutants-grid">
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">PM2.5</p>
+                            <p id="pm25Value" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">PM10</p>
+                            <p id="pm10Value" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">O₃</p>
+                            <p id="o3Value" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">NO₂</p>
+                            <p id="no2Value" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">SO₂</p>
+                            <p id="so2Value" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                        <div class="pollutant-card">
+                            <p class="pollutant-name">CO</p>
+                            <p id="coValue" class="pollutant-value">-</p>
+                            <p class="pollutant-unit">µg/m³</p>
+                        </div>
+                    </div>
+
+                    <!-- AQI Scale Reference -->
+                    <div class="aqi-scale">
+                        <h3>Air Quality Scale</h3>
+                        <div class="scale-items">
+                            <div class="scale-item good">
+                                <span class="scale-dot"></span>
+                                <span class="scale-text">1-50: Good</span>
+                            </div>
+                            <div class="scale-item fair">
+                                <span class="scale-dot"></span>
+                                <span class="scale-text">51-100: Fair</span>
+                            </div>
+                            <div class="scale-item moderate">
+                                <span class="scale-dot"></span>
+                                <span class="scale-text">101-150: Moderate</span>
+                            </div>
+                            <div class="scale-item poor">
+                                <span class="scale-dot"></span>
+                                <span class="scale-text">151-200: Poor</span>
+                            </div>
+                            <div class="scale-item veryPoor">
+                                <span class="scale-dot"></span>
+                                <span class="scale-text">201+: Very Poor</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Welcome Message -->
+        <div id="welcomeMessage" class="welcome-message">
+            <div class="welcome-content">
+                <h2>Welcome to Weather App</h2>
+                <p>Search for any city to see the current weather conditions</p>
+                <ul class="features">
+                    <li>✓ Real-time weather data</li>
+                    <li>✓ Temperature in Celsius or Fahrenheit</li>
+                    <li>✓ Detailed weather metrics</li>
+                    <li>✓ Location-based search</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
